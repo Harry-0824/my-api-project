@@ -69,7 +69,7 @@ CREATE TABLE vehicle_models (
     slug VARCHAR(50) UNIQUE COMMENT 'url 用 slug'
 );
 
--- 3.2 車型 (Trim) - e.g., HS 1.5T 旗艦版
+-- 3.2 車型 (Trim) - e.g., HS 1.5T 旗艦版-- 3.5/3.6/3.7 整合進來
 CREATE TABLE vehicle_trims (
     id INT AUTO_INCREMENT PRIMARY KEY,
     model_id INT NOT NULL,
@@ -95,48 +95,10 @@ CREATE TABLE vehicle_colors (
     image_src VARCHAR(255) COMMENT '車輛外觀圖',
     swatch_src VARCHAR(255) COMMENT '色票圖',
     
-    -- 因為尺寸圖有分 mobile/desktop 或是不同角度，用 JSON 存比較靈活
+    -- 因為尺寸圖有分 mobile/desktop 或是不同角度，用 JSON 存比較靈活-- 改為img
     dimensions_json JSON COMMENT '三視圖資料',
     
     FOREIGN KEY (trim_id) REFERENCES vehicle_trims(id) ON DELETE CASCADE
 );
 
--- 3.4 重點配備 (Equipment) - 對應 vehicleSpec.js 的 equipment
-CREATE TABLE vehicle_equipments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    trim_id INT NOT NULL,
-    item_name VARCHAR(255) NOT NULL,
-    column_group TINYINT DEFAULT 1 COMMENT '用於前端排版分欄 (1 或 2)',
-    sort_order INT DEFAULT 0,
-    FOREIGN KEY (trim_id) REFERENCES vehicle_trims(id) ON DELETE CASCADE
-);
-
--- 3.5 基本規格摘要 (Basic Specs) - 對應 vehicleSpec.js 的 basicSpecs
-CREATE TABLE vehicle_basic_specs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    trim_id INT NOT NULL,
-    label VARCHAR(100) NOT NULL COMMENT 'e.g., 引擎型式',
-    value VARCHAR(255) NOT NULL COMMENT 'e.g., 1.5T...',
-    sort_order INT DEFAULT 0,
-    FOREIGN KEY (trim_id) REFERENCES vehicle_trims(id) ON DELETE CASCADE
-);
-
--- 3.6 詳細規格分類 (Spec Categories) - 對應 detailedSpecs.js 的 Key (e.g., 動力系統, 外觀配置)
-CREATE TABLE spec_categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
-);
-
--- 3.7 詳細規格內容 (Detailed Specs) - 對應 detailedSpecs.js 的 Values
-CREATE TABLE vehicle_detailed_specs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    trim_id INT NOT NULL,
-    category_id INT NOT NULL,
-    label VARCHAR(100) NOT NULL COMMENT '規格名稱',
-    value TEXT NOT NULL COMMENT '規格內容，有些可能很長',
-    is_highlight BOOLEAN DEFAULT TRUE COMMENT '是否顯示圓點(●)或是直接顯示文字',
-    sort_order INT DEFAULT 0,
-    
-    FOREIGN KEY (trim_id) REFERENCES vehicle_trims(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES spec_categories(id) ON DELETE CASCADE
-);
+ 
