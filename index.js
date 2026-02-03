@@ -2,6 +2,18 @@ require("dotenv").config(); // 載入環境變數
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
+const db = require("./models");
+
+// 檢查資料庫連線
+db.sequelize
+  .authenticate()
+  .then(() => {
+    console.log("資料庫連線成功 (Sequelize)");
+    // db.sequelize.sync(); // 如果需要自動同步資料表結構可開啟
+  })
+  .catch((err) => {
+    console.error("資料庫連線失敗:", err);
+  });
 
 // 引入路由
 const modelsRouter = require("./routes/models");
