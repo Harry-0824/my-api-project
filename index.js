@@ -9,7 +9,10 @@ db.sequelize
   .authenticate()
   .then(() => {
     console.log("資料庫連線成功 (Sequelize)");
-    // db.sequelize.sync(); // 如果需要自動同步資料表結構可開啟
+    // 自動同步資料表結構 (研發環境使用)
+    db.sequelize.sync({ alter: true }).then(() => {
+      console.log("資料表同步完成");
+    });
   })
   .catch((err) => {
     console.error("資料庫連線失敗:", err);
