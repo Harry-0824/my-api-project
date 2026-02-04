@@ -1,0 +1,59 @@
+### 測試 Vehicle Models (車系)
+
+# 1. 取得所有車系
+GET http://localhost:3000/api/models
+Accept: application/json
+
+###
+
+# 2. 新增一個車系
+# @name createModel
+POST http://localhost:3000/api/models
+Content-Type: application/json
+
+{
+  "name": "Toyota Corolla",
+  "slug": "corolla-2024"
+}
+
+###
+
+# 3. 根據 ID 取得單一車系 (請自行修改 ID)
+GET http://localhost:3000/api/models/1
+Accept: application/json
+
+###
+
+# 4. 更新車系 (請自行修改 ID)
+PUT http://localhost:3000/api/models/1
+Content-Type: application/json
+
+{
+  "name": "Toyota Corolla Altis",
+  "slug": "corolla-altis-2024"
+}
+
+###
+
+# 5. 刪除車系 (請自行修改 ID)
+DELETE http://localhost:3000/api/models/1
+
+
+### 測試 Vehicle Trims (車型)
+
+# 1. 取得所有車型
+GET http://localhost:3000/api/trims
+Accept: application/json
+
+###
+
+# 2. 新增一個車型 (!!! 注意：model_id 必須是已經存在的車系 ID !!!)
+# 如果你剛剛建立了第一個車系，它的 ID 通常是 1
+POST http://localhost:3000/api/trims
+Content-Type: application/json
+
+{
+  "model_id": 2,
+  "name": "Grande 1.8V",
+  "price": 850000
+}
