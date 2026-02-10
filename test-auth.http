@@ -1,0 +1,36 @@
+### 註冊新使用者
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "new_member",
+    "email": "new@example.com",
+    "password": "password123"
+}
+
+### 登入 (成功)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "harry@example.com",
+    "password": "password123"
+}
+
+### 登入 (失敗 - 密碼錯誤)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "harry@example.com",
+    "password": "wrongpassword"
+}
+
+### 登入 (失敗 - 電子郵件不存在)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "nonexistent@example.com",
+    "password": "password123"
+}

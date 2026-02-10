@@ -21,6 +21,7 @@ db.sequelize
 // 引入路由
 const modelsRouter = require("./routes/models");
 const trimsRouter = require("./routes/trims");
+const authRouter = require("./routes/auth");
 
 // 中介軟體
 app.use(express.json());
@@ -28,6 +29,7 @@ app.use(express.json());
 // 掛載路由
 app.use("/api/models", modelsRouter);
 app.use("/api/trims", trimsRouter);
+app.use("/api/auth", authRouter);
 
 // 測試用路由
 app.get("/api/hello", (req, res) => {
