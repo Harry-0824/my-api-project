@@ -1,0 +1,45 @@
+require("dotenv").config(); // 載入環境變數
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 3000;
+const db = require("./models");
+
+// 檢查資料庫連線
+db.sequelize
+  .authenticate()
+  .then(() => {
+    console.log("資料庫連線成功 (Sequelize)");
+    // 自動同步資料表結構 (研發環境使用)
+    db.sequelize.sync({ alter: true }).then(() => {
+      console.log("資料表同步完成");
+    });
+  })
+  .catch((err) => {
+    console.error("資料庫連線失敗:", err);
+  });
+
+// 引入路由
+const modelsRouter = require("./routes/models");
+const trimsRouter = require("./routes/trims");
+const authRouter = require("./routes/auth");
+
+// 中介軟體
+app.use(express.json());
+
+// 掛載路由
+app.use("/api/models", modelsRouter);
+app.use("/api/trims", trimsRouter);
+app.use("/api/auth", authRouter);
+
+// 測試用路由
+app.get("/api/hello", (req, res) => {
+  const name = req.query.name || "World";
+  res.status(200).json({
+    message: "GET 請求成功！",
+    data: `Hello, ${name}!`,
+  });
+});
+
+app.listen(port, () => {
+  console.log(`伺服器已啟動，正在監聽 http://localhost:${port}`);
+});

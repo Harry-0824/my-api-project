@@ -1,0 +1,3 @@
+curl -X POST http://localhost:3000/api/data \
+     -H "Content-Type: application/json" \
+     -d '{"id": 1, "item": "手機", "price": 20000}'
