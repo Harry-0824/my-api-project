@@ -91,7 +91,7 @@ const authController = {
 
       // 設定 Token 及過期時間 (1小時後)
       user.resetPasswordToken = token;
-      user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+      user.resetPasswordExpires = Date.now() + 3600000; // 1 小時
       await user.save();
 
       // 設定 Nodemailer Transporter

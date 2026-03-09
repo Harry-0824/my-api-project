@@ -1,9 +1,25 @@
-const { VehicleTrim } = require('../models');
+const { VehicleTrim, VehicleModel } = require('../models');
 
 // 取得所有車型
 exports.getAllTrims = async (req, res) => {
   try {
-    const trims = await VehicleTrim.findAll();
+    const { model_slug } = req.query;
+    const where = {};
+    const include = [];
+
+    if (model_slug) {
+      include.push({
+        model: VehicleModel,
+        as: 'model',
+        where: { slug: model_slug },
+        required: true
+      });
+    }
+
+    const trims = await VehicleTrim.findAll({ 
+      where,
+      include 
+    });
     res.json(trims);
   } catch (err) {
     res.status(500).json({ error: err.message });
