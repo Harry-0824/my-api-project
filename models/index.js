@@ -11,6 +11,8 @@ const db = {
 db.VehicleModel = require('./VehicleModel')(sequelize, Sequelize);
 db.VehicleTrim = require('./VehicleTrim')(sequelize, Sequelize);
 db.User = require('./User')(sequelize, Sequelize);
+db.Article = require('./Article')(sequelize, Sequelize);
+db.HomeSlide = require('./HomeSlide')(sequelize, Sequelize);
 
 // 定義關聯 (Associations)
 // 遍歷所有模型，若模型中有定義 associate 方法則執行，用來建立資料表之間的關係
