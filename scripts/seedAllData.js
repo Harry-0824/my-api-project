@@ -2,44 +2,50 @@ require('dotenv').config({ path: __dirname + '/../.env' });
 const db = require('../models');
 
 async function seedData() {
+  const { sequelize, HomeSlide, Article, VehicleModel, VehicleTrim } = db;
+
   try {
-    const { HomeSlide, Article, VehicleModel, VehicleTrim } = db;
-
     console.log("Connecting database...");
-    await db.sequelize.authenticate();
-    await db.sequelize.sync({ alter: true });
+    await sequelize.authenticate();
+    
+    // 1. 暫時關閉外鍵檢查，以便清理舊資料
+    console.log("Disabling foreign key checks...");
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
 
-    // 1. 清理舊資料
+    // 2. 同步資料表結構
+    await sequelize.sync({ alter: true });
+
+    // 3. 清理舊資料 (現在不會因為外鍵報錯了)
     console.log("Cleaning up old data...");
-    await HomeSlide.destroy({ where: {}, truncate: true, cascade: true });
-    await Article.destroy({ where: {}, truncate: true, cascade: true });
-    // SQLite 可能不支援 truncate cascade，但在 MySQL 中可以。注意，外鍵約束可能會導致問題。
-    // 如果外鍵限制嚴格，使用 destroy 而不使用 truncate 會更安全。
-    // 我們改用 destroy({ where: {} });
-    await VehicleTrim.destroy({ where: {} });
-    await VehicleModel.destroy({ where: {} });
+    await HomeSlide.destroy({ where: {}, truncate: true });
+    await Article.destroy({ where: {}, truncate: true });
+    await VehicleTrim.destroy({ where: {}, truncate: true });
+    await VehicleModel.destroy({ where: {}, truncate: true });
 
-    // 2. 導入前端資料
-    console.log("Loading frontend data via dynamic import...");
-    const slidesData = await import('file:///C:/Users/princ/Desktop/MG-motor-main/src/data/home/slides.js');
-    const articlesData = await import('file:///C:/Users/princ/Desktop/MG-motor-main/src/data/articles.js');
-    const hsSpec = await import('file:///C:/Users/princ/Desktop/MG-motor-main/src/data/hs/vehicleSpec.js');
-    const hsDetailed = await import('file:///C:/Users/princ/Desktop/MG-motor-main/src/data/hs/detailedSpecs.js');
-    const zsSpec = await import('file:///C:/Users/princ/Desktop/MG-motor-main/src/data/zs/vehicleSpec.js');
-    const zsDetailed = await import('file:///C:/Users/princ/Desktop/MG-motor-main/src/data/zs/detailedSpecs.js');
+    // 重新開啟外鍵檢查
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 
-    // 3. 填充輪播圖資料
+    // 4. 導入前端資料 (請確保這些路徑在 GCP 伺服器上有效，或改用相對路徑)
+    console.log("Loading data...");
+    // 註：在雲端環境建議直接將資料定義在腳本內，或確認檔案路徑正確
+    const slidesData = await import('../src/data/home/slides.js'); 
+    const articlesData = await import('../src/data/articles.js');
+    const hsSpec = await import('../src/data/hs/vehicleSpec.js');
+    const hsDetailed = await import('../src/data/hs/detailedSpecs.js');
+    const zsSpec = await import('../src/data/zs/vehicleSpec.js');
+    const zsDetailed = await import('../src/data/zs/detailedSpecs.js');
+
+    // 5. 填充輪播圖資料
     console.log("Seeding Slides...");
     const desktopSlides = slidesData.desktopSlides.map((s, idx) => ({ ...s, type: 'desktop', order: idx + 1, subtitle: s.h2, title: s.h1 }));
     const mobileSlides = slidesData.mobileSlides.map((s, idx) => ({ ...s, type: 'mobile', order: idx + 1, subtitle: s.h2, title: s.h1 }));
     await HomeSlide.bulkCreate([...desktopSlides, ...mobileSlides]);
 
-    // 4. 填充文章資料
+    // 6. 填充文章資料
     console.log("Seeding Articles...");
-    const articles = articlesData.allArticles;
-    await Article.bulkCreate(articles);
+    await Article.bulkCreate(articlesData.allArticles);
 
-    // 5. 填充車系與車型資料
+    // 7. 填充車系與車型資料
     console.log("Seeding Models & Trims...");
     const hs = await VehicleModel.create({ name: hsSpec.hsSpecData.modelName, slug: 'hs' });
     for (const trim of hsSpec.hsSpecData.trims) {
@@ -74,6 +80,8 @@ async function seedData() {
     console.log("Data migration to MySQL completed successfully.");
     process.exit(0);
   } catch (error) {
+    // 發生錯誤時也試著把檢查開回來，避免影響後續操作
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
     console.error("Migration failed:", error);
     process.exit(1);
   }

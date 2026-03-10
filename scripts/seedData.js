@@ -111,21 +111,29 @@ const articles = [
 
 async function seed() {
   try {
+    // 暫時關閉外鍵檢查
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+    
     await sequelize.sync();
     console.log("Database synced");
 
     // Seed Slides
-    await HomeSlide.destroy({ where: {} });
+    await HomeSlide.destroy({ where: {}, truncate: true });
+    // ... 你的 desktopSlides / mobileSlides 陣列 ...
     await HomeSlide.bulkCreate([...desktopSlides, ...mobileSlides]);
     console.log("Slides seeded");
 
     // Seed Articles
-    await Article.destroy({ where: {} });
+    await Article.destroy({ where: {}, truncate: true });
+    // ... 你的 articles 陣列 ...
     await Article.bulkCreate(articles);
     console.log("Articles seeded");
 
+    // 重新開啟外鍵檢查
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
     process.exit(0);
   } catch (err) {
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
     console.error("Seeding failed:", err);
     process.exit(1);
   }
