@@ -38,6 +38,15 @@ module.exports = (sequelize, DataTypes) => {
     detailed_specs_json: {
       type: DataTypes.JSON, // 詳細規格 JSON 格式
     },
+    colors_json: {
+      type: DataTypes.JSON, // 車色清單 JSON 格式
+    },
+    equipment_json: {
+      type: DataTypes.JSON, // 配備清單 JSON 格式
+    },
+    spec_images_json: {
+      type: DataTypes.JSON, // 車身視圖與主圖 JSON 格式
+    },
   }, {
     tableName: 'vehicle_trims',
     timestamps: false,
