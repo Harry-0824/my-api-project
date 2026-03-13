@@ -44,11 +44,11 @@ app.get("/api/seed", async (req, res) => {
   try {
     const { HomeSlide, Article, VehicleModel, VehicleTrim } = db;
     
-    // 1. 清理舊資料
-    await HomeSlide.destroy({ where: {}, truncate: true });
-    await Article.destroy({ where: {}, truncate: true });
-    await VehicleTrim.destroy({ where: {}, truncate: true });
-    await VehicleModel.destroy({ where: {}, truncate: true });
+    // 1. 清理舊資料 (不使用 truncate 避免 MySQL 外鍵衝突)
+    await HomeSlide.destroy({ where: {} });
+    await Article.destroy({ where: {} });
+    await VehicleTrim.destroy({ where: {} });
+    await VehicleModel.destroy({ where: {} });
 
     // 2. 填充輪播圖資料
     const desktopSlides = [

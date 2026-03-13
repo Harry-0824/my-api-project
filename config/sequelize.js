@@ -15,10 +15,10 @@ const sequelizeOptions = {
 
 // 這是 Cloud Run 要求的 Socket 連線方式
 if (isProduction && dbHost.startsWith('/cloudsql/')) {
+  sequelizeOptions.host = dbHost; // 同時將 host 設為 socket 路徑
   sequelizeOptions.dialectOptions = {
-    socketPath: dbHost // 這裡會變成 /cloudsql/my-mg-backend:asia-east1:mg-api-db
+    socketPath: dbHost
   };
-  // 注意：使用 socketPath 時，通常不需要設定 host 屬性
 } else {
   sequelizeOptions.host = dbHost;
 }
