@@ -13,10 +13,19 @@ db.sequelize
   .authenticate()
   .then(() => {
     console.log("資料庫連線成功 (Sequelize)");
-    // 自動同步資料表結構 (研發環境使用)
-    db.sequelize.sync({ alter: true }).then(() => {
-      console.log("資料表同步完成");
-    });
+    // 自動同步資料表結構僅於非 production 使用
+    if (process.env.NODE_ENV !== "production") {
+      db.sequelize
+        .sync({ alter: true })
+        .then(() => {
+          console.log("資料表同步完成");
+        })
+        .catch((err) => {
+          console.error("資料表同步失敗:", err);
+        });
+    } else {
+      console.log("production 環境，跳過資料表同步");
+    }
   })
   .catch((err) => {
     console.error("資料庫連線失敗:", err);

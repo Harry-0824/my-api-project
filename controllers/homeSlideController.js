@@ -1,14 +1,15 @@
-const { HomeSlide } = require('../models');
+const { HomeSlide } = require("../models");
 
 // 取得所有首頁輪播圖
 exports.getAllSlides = async (req, res) => {
   try {
     const slides = await HomeSlide.findAll({
-      order: [['order', 'ASC']]
+      order: [["order", "ASC"]],
     });
     res.json(slides);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("HomeSlide controller error:", err);
+    res.status(500).json({ message: err.message, error: err.message });
   }
 };
 
@@ -18,6 +19,7 @@ exports.createSlide = async (req, res) => {
     const newSlide = await HomeSlide.create(req.body);
     res.status(201).json(newSlide);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("HomeSlide controller error:", err);
+    res.status(500).json({ message: err.message, error: err.message });
   }
 };

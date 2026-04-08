@@ -34,7 +34,8 @@ exports.getAllTrims = async (req, res) => {
 
     res.json(formattedTrims);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("VehicleTrim controller error:", err);
+    res.status(500).json({ message: err.message, error: err.message });
   }
 };
 
@@ -47,7 +48,8 @@ exports.getTrimById = async (req, res) => {
     }
     res.json(trim);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("VehicleTrim controller error:", err);
+    res.status(500).json({ message: err.message, error: err.message });
   }
 };
 
@@ -57,7 +59,8 @@ exports.createTrim = async (req, res) => {
     const newTrim = await VehicleTrim.create(req.body);
     res.status(201).json(newTrim);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("VehicleTrim controller error:", err);
+    res.status(500).json({ message: err.message, error: err.message });
   }
 };
 
@@ -73,7 +76,8 @@ exports.updateTrim = async (req, res) => {
     const updatedTrim = await VehicleTrim.findByPk(req.params.id);
     res.json(updatedTrim);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("VehicleTrim controller error:", err);
+    res.status(500).json({ message: err.message, error: err.message });
   }
 };
 
@@ -88,6 +92,7 @@ exports.deleteTrim = async (req, res) => {
     }
     res.json({ message: "Trim deleted successfully (刪除成功)" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("VehicleTrim controller error:", err);
+    res.status(500).json({ message: err.message, error: err.message });
   }
 };
