@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # 安裝生產環境所需的依賴套件 (忽略開發套件)
-RUN npm install --only=production
+RUN npm ci --omit=dev
 
 # 複製其餘專案程式碼
 COPY . .
