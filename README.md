@@ -14,7 +14,7 @@
 
 - **核心**: Node.js, Express (v5.2.1)
 - **資料庫 ORM**: [Sequelize](https://sequelize.org/)
-- **資料庫**: MySQL (mysql2 驅動)
+- **資料庫**: PostgreSQL — 託管於 [Supabase](https://supabase.com/)（pg 驅動）
 - **認證管理**: [jsonwebtoken (JWT)](https://jwt.io/), [bcryptjs](https://github.com/dcodeIO/bcrypt.js)
 - **郵件服務**: [Nodemailer](https://nodemailer.com/) (用於密碼重置)
 - **跨域處理**: [CORS](https://github.com/expressjs/cors)
@@ -22,80 +22,100 @@
 ## 📦 安裝與設定
 
 ### 1. 安裝套件
+
 而在專案根目錄執行：
+
 ```bash
 npm install
 ```
 
 ### 2. 環境變數設定 (.env)
+
 請建立 `.env` 檔案並設定以下變數：
+
 ```env
 PORT=3000
-DB_HOST=127.0.0.1
-DB_USER=root
-DB_PASS=你的密碼
-DB_NAME=my_api_db
-JWT_SECRET=你的私鑰
+NODE_ENV=development
+
+# Supabase 直連（本地開發用）
+DB_HOST=db.<project-ref>.supabase.co
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=你的Supabase資料庫密碼
+DB_NAME=postgres
+
+JWT_SECRET=請使用高熵隨機字串
 EMAIL_USER=你的信箱
 EMAIL_PASS=你的應用程式碼
 ```
 
-### 3. 資料庫初始化與填充
-如果你是第一次啟動專案，或需要恢復預設資料：
+> **生產環境 (Cloud Run)**：`DB_HOST` 改為 Supabase Transaction Pooler 主機，`DB_PORT` 改為 `6543`，`DB_USER` 格式為 `postgres.<project-ref>`。
 
-- **法一：使用 npm 指令** (推薦)
-  ```bash
-  # 建立資料庫
-  npm run db:setup
-  # 填充初始資料
-  npm run db:seed
-  ```
-- **法二：使用 API 端點**
-  存取 `GET http://localhost:3000/api/seed` 即可自動填充預設資料。
+### 3. 填充初始資料
+
+Supabase 資料庫建立後，直接執行 seed 腳本填入初始資料：
+
+```bash
+npm run db:seed
+```
+
+或透過 API 端點：
+
+```
+GET http://localhost:3000/api/seed
+```
+
+> `db:setup` 腳本（建立 MySQL 資料庫用）已不適用，Supabase 資料庫由 Supabase Dashboard 管理。
 
 ## 📖 完整 API 端點列表
 
 ### 使用者認證 (`/api/auth`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| POST | `/register` | 註冊新帳號 |
-| POST | `/login` | 登入並取得 Token |
-| POST | `/forgot-password` | 發送密碼重置信件 |
-| POST | `/reset-password/:token`| 執行密碼重置 |
-| GET | `/profile` | 取得個人資料 (需 Token) |
+
+| 方法 | 路徑                     | 說明                    |
+| :--- | :----------------------- | :---------------------- |
+| POST | `/register`              | 註冊新帳號              |
+| POST | `/login`                 | 登入並取得 Token        |
+| POST | `/forgot-password`       | 發送密碼重置信件        |
+| POST | `/reset-password/:token` | 執行密碼重置            |
+| GET  | `/profile`               | 取得個人資料 (需 Token) |
 
 ### 車系管理 (`/api/models`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| GET | `/` | 取得所有車系 |
-| GET | `/:id` | 取得特定車系 |
-| POST | `/` | 新增車系 |
-| PUT | `/:id` | 更新車系內容 |
-| DELETE | `/:id` | 刪除車系 |
+
+| 方法   | 路徑   | 說明         |
+| :----- | :----- | :----------- |
+| GET    | `/`    | 取得所有車系 |
+| GET    | `/:id` | 取得特定車系 |
+| POST   | `/`    | 新增車系     |
+| PUT    | `/:id` | 更新車系內容 |
+| DELETE | `/:id` | 刪除車系     |
 
 ### 車型管理 (`/api/trims`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| GET | `/` | 取得所有車型 (支援 `?model_slug=hs` 過濾) |
-| GET | `/:id` | 取得特定車型詳細規格 |
-| POST | `/` | 新增車型 |
-| PUT | `/:id` | 更新車型內容 |
-| DELETE | `/:id` | 刪除車型 |
+
+| 方法   | 路徑   | 說明                                      |
+| :----- | :----- | :---------------------------------------- |
+| GET    | `/`    | 取得所有車型 (支援 `?model_slug=hs` 過濾) |
+| GET    | `/:id` | 取得特定車型詳細規格                      |
+| POST   | `/`    | 新增車型                                  |
+| PUT    | `/:id` | 更新車型內容                              |
+| DELETE | `/:id` | 刪除車型                                  |
 
 ### 首頁輪播圖 (`/api/slides`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| GET | `/` | 依排序取得所有輪播圖 |
-| POST | `/` | 新增輪播圖 (管理介面用) |
+
+| 方法 | 路徑 | 說明                    |
+| :--- | :--- | :---------------------- |
+| GET  | `/`  | 依排序取得所有輪播圖    |
+| POST | `/`  | 新增輪播圖 (管理介面用) |
 
 ### 最新消息文章 (`/api/articles`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| GET | `/` | 取得文章清單 (可依 `?category=最新活動` 過濾) |
-| GET | `/:id` | 取得文章完整內容 (包含 JSON 格式) |
-| POST | `/` | 發佈新文章 |
+
+| 方法 | 路徑   | 說明                                          |
+| :--- | :----- | :-------------------------------------------- |
+| GET  | `/`    | 取得文章清單 (可依 `?category=最新活動` 過濾) |
+| GET  | `/:id` | 取得文章完整內容 (包含 JSON 格式)             |
+| POST | `/`    | 發佈新文章                                    |
 
 ## 📂 專案結構
+
 - `controllers/`: 各功能模組的業務邏輯處理中心。
 - `models/`: 資料表結構 (Schema) 的定義與關聯設定。
 - `routes/`: 定義 API 端點路徑。
@@ -105,5 +125,6 @@ EMAIL_PASS=你的應用程式碼
 - `seedAllData.js`: 用於將前端 JS 資料遷移/同步至 MySQL 的核心指令碼。
 
 ## 🧪 測試工具
+
 - **Postman**: 匯入 `tests/postman_collection.json`。
 - **REST Client**: 可使用 `tests/` 資料夾中的 `.http` 檔案進行測試 (如 `tests/api-tests.http`)。
