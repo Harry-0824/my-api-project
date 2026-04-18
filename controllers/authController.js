@@ -28,12 +28,12 @@ const authController = {
       });
 
       res.status(201).json({
-        message: "註冊成功",
-        userId: user.id,
+        success: true,
+        data: { userId: user.id, message: "註冊成功" },
       });
     } catch (error) {
       console.error("Register error:", error);
-      res.status(500).json({ message: "伺服器錯誤", error: error.message });
+      res.status(500).json({ success: false, message: "伺服器內部錯誤" });
     }
   },
 
@@ -57,22 +57,24 @@ const authController = {
       // 簽發 JWT
       const token = jwt.sign(
         { userId: user.id, username: user.username },
-        process.env.JWT_SECRET || "secret",
+        process.env.JWT_SECRET,
         { expiresIn: "24h" },
       );
 
       res.status(200).json({
-        message: "登入成功",
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
+        success: true,
+        data: {
+          token,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+          },
         },
       });
     } catch (error) {
       console.error("Login error:", error);
-      res.status(500).json({ message: "伺服器錯誤", error: error.message });
+      res.status(500).json({ success: false, message: "伺服器內部錯誤" });
     }
   },
 
@@ -118,10 +120,12 @@ const authController = {
 
       await transporter.sendMail(mailOptions);
 
-      res.status(200).json({ message: "重置信件已發送至您的信箱" });
+      res
+        .status(200)
+        .json({ success: true, message: "重置信件已發送至您的信筱" });
     } catch (error) {
       console.error("Forgot Password error:", error);
-      res.status(500).json({ message: "發送郵件失敗", error: error.message });
+      res.status(500).json({ success: false, message: "伺服器內部錯誤" });
     }
   },
 
@@ -152,10 +156,10 @@ const authController = {
       user.resetPasswordExpires = null;
       await user.save();
 
-      res.status(200).json({ message: "密碼已成功重置" });
+      res.status(200).json({ success: true, message: "密碼已成功重置" });
     } catch (error) {
       console.error("Reset Password error:", error);
-      res.status(500).json({ message: "重置密碼失敗", error: error.message });
+      res.status(500).json({ success: false, message: "伺服器內部錯誤" });
     }
   },
 
@@ -174,12 +178,12 @@ const authController = {
       }
 
       res.status(200).json({
-        message: "取得會員資料成功",
-        user,
+        success: true,
+        data: { user },
       });
     } catch (error) {
       console.error("Get Profile error:", error);
-      res.status(500).json({ message: "伺服器錯誤", error: error.message });
+      res.status(500).json({ success: false, message: "伺服器內部錯誤" });
     }
   },
 };

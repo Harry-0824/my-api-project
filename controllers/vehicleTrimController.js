@@ -16,6 +16,38 @@ exports.getAllTrims = async (req, res) => {
       });
     }
 
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    if (page > 0 && limit > 0) {
+      const offset = (page - 1) * limit;
+      const { count, rows } = await VehicleTrim.findAndCountAll({
+        where,
+        include,
+        offset,
+        limit,
+      });
+      const formattedTrims = rows.map((trim) => {
+        const data = trim.get({ plain: true });
+        data.colors = data.colors_json;
+        data.equipment = data.equipment_json;
+        data.specImages = data.spec_images_json;
+        data.basicSpecs = data.basic_specs_json;
+        data.detailedSpecs = data.detailed_specs_json;
+        return data;
+      });
+      return res.json({
+        success: true,
+        data: formattedTrims,
+        pagination: {
+          page,
+          limit,
+          total: count,
+          totalPages: Math.ceil(count / limit),
+        },
+      });
+    }
+
     const trims = await VehicleTrim.findAll({
       where,
       include,
@@ -32,9 +64,10 @@ exports.getAllTrims = async (req, res) => {
       return data;
     });
 
-    res.json(formattedTrims);
+    res.json({ success: true, data: formattedTrims });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("取得車型失敗:", err);
+    res.status(500).json({ success: false, message: "伺服器內部錯誤" });
   }
 };
 
@@ -43,11 +76,12 @@ exports.getTrimById = async (req, res) => {
   try {
     const trim = await VehicleTrim.findByPk(req.params.id);
     if (!trim) {
-      return res.status(404).json({ message: "Trim not found (找不到該車型)" });
+      return res.status(404).json({ success: false, message: "找不到該車型" });
     }
-    res.json(trim);
+    res.json({ success: true, data: trim });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("取得車型失敗:", err);
+    res.status(500).json({ success: false, message: "伺服器內部錯誤" });
   }
 };
 
@@ -55,9 +89,10 @@ exports.getTrimById = async (req, res) => {
 exports.createTrim = async (req, res) => {
   try {
     const newTrim = await VehicleTrim.create(req.body);
-    res.status(201).json(newTrim);
+    res.status(201).json({ success: true, data: newTrim });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("新增車型失敗:", err);
+    res.status(500).json({ success: false, message: "伺服器內部錯誤" });
   }
 };
 
@@ -68,12 +103,13 @@ exports.updateTrim = async (req, res) => {
       where: { id: req.params.id },
     });
     if (updated === 0) {
-      return res.status(404).json({ message: "Trim not found (找不到該車型)" });
+      return res.status(404).json({ success: false, message: "找不到該車型" });
     }
     const updatedTrim = await VehicleTrim.findByPk(req.params.id);
-    res.json(updatedTrim);
+    res.json({ success: true, data: updatedTrim });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("更新車型失敗:", err);
+    res.status(500).json({ success: false, message: "伺服器內部錯誤" });
   }
 };
 
@@ -84,10 +120,11 @@ exports.deleteTrim = async (req, res) => {
       where: { id: req.params.id },
     });
     if (deleted === 0) {
-      return res.status(404).json({ message: "Trim not found (找不到該車型)" });
+      return res.status(404).json({ success: false, message: "找不到該車型" });
     }
-    res.json({ message: "Trim deleted successfully (刪除成功)" });
+    res.json({ success: true, message: "刪除成功" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("刪除車型失敗:", err);
+    res.status(500).json({ success: false, message: "伺服器內部錯誤" });
   }
 };
