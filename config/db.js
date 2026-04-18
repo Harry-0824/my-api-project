@@ -1,15 +1,14 @@
 require("dotenv").config();
-const mysql = require("mysql2");
+const { Pool } = require("pg");
 
-const pool = mysql.createPool({
+const pool = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
+  port: parseInt(process.env.DB_PORT || "5432", 10),
+  ssl: { require: true, rejectUnauthorized: false },
+  max: 10,
 });
 
-// 使用 Promise wrapper 以便使用 async/await
-module.exports = pool.promise();
+module.exports = pool;
