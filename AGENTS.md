@@ -27,6 +27,45 @@ AI coding agents must use this file as the repository-level workflow contract fo
 
 Use the branch type that matches the issue. Documentation-only work should use `docs/*`.
 
+## Post-Merge Cleanup Rules
+
+After a PR is successfully merged, clean up the PR head branch when it is safe to do so.
+
+Delete both:
+
+- the remote PR branch
+- the local PR branch
+
+Only clean up branches that clearly belong to the merged PR and match these work branch patterns:
+
+- `feature/*`
+- `fix/*`
+- `docs/*`
+
+Do not delete:
+
+- `main`
+- `master`
+- `develop`
+- `release/*`
+- `production/*`
+- protected branches
+- branches that are not clearly the merged PR head branch
+- branches with unmerged or uncertain work
+
+Recommended cleanup commands when safe:
+
+```bash
+git checkout main
+git pull origin main
+git branch -d <branch-name>
+git push origin --delete <branch-name>
+```
+
+Do not use `git branch -D` unless the user explicitly approves a force delete.
+
+If the environment or tool cannot delete the branch, report the exact branch name and the manual cleanup commands needed.
+
 ## Commands
 
 - `npm start`: run the server with `node index.js`.
