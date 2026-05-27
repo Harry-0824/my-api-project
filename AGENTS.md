@@ -5,7 +5,7 @@ AI coding agents must use this file as the repository-level workflow contract fo
 ## Project Profile
 
 - This is an Express 5 REST API backend for the MG Motor portfolio project.
-- The stack is Node.js, CommonJS, Sequelize 6, MySQL 8, JWT auth, bcryptjs, Nodemailer, and dotenv.
+- The stack is Node.js, CommonJS, Sequelize 6, MySQL 8, JWT auth, bcryptjs, Nodemailer, dotenv, Jest, and Supertest.
 - The backend is part of a Supabase-deployed portfolio workflow; do not change deployment settings unless an issue explicitly asks for it.
 - Use `npm` as the package manager.
 
@@ -13,6 +13,7 @@ AI coding agents must use this file as the repository-level workflow contract fo
 
 - Keep tasks small, issue-driven, and limited to the requested scope.
 - Read the relevant issue, existing code, and local conventions before editing.
+- Start from the issue's `Suggested Files` and avoid scanning unrelated directories.
 - Prefer the existing project structure and CommonJS style.
 - Do not create broad refactors while completing a narrow issue.
 - Do not create extra markdown files unless the user or issue explicitly requests them.
@@ -79,6 +80,7 @@ Do not switch package managers or introduce lockfiles from another package manag
 
 - Use Sequelize ORM for database access. Do not add raw SQL queries in application code.
 - Do not change database schema, migrations, seed data, or setup scripts unless the issue explicitly asks for schema/data work.
+- Do not modify Sequelize model contracts unless the issue explicitly requests model changes.
 - Keep route, controller, model, and middleware changes scoped to the requested API behavior.
 - Preserve the API response format:
 
@@ -107,5 +109,6 @@ For documentation issues:
 Before finishing:
 
 - Run the most relevant lightweight check for the task.
+- When API behavior changes, run the relevant Jest/Supertest checks.
 - For docs-only changes, inspect `git diff -- AGENTS.md`.
 - Confirm `git status --short` only includes intended files for the branch or stage only the intended files.
