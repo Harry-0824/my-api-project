@@ -1,109 +1,113 @@
-# MG 汽車 API 專案 (My API Project)
+# MG Motor Backend API (`my-api-project`)
 
-這是一個為 MG 汽車網站設計的後端 API 專案，基於 Node.js、Express 和 Sequelize (ORM) 建構。支援使用者認證、首頁輪播圖、最新消息 (文章) 以及車系與車型的資料管理。
+這個專案是 **MG Motor 前端專案** 的後端 API，提供車型資料、登入驗證與內容資料服務。
 
-## 🚀 核心功能
+- 前端專案：<https://github.com/Harry-0824/MG-motor>
+- 後端角色：提供前端所需的資料查詢、管理操作與驗證機制，組成完整全端作品。
 
-- **使用者認證 (Auth)**: 支援註冊、登入、JWT 驗證、忘記密碼與重置密碼功能。
-- **車系與車型管理 (Models & Trims)**: 提供完整的 CRUD 介面，並支援車系與車型之間的關聯查詢。
-- **首頁輪播圖 (Slides)**: 儲存與管理電腦版 (Desktop) 及手機版 (Mobile) 的輪播圖資訊。
-- **文章/新聞管理 (Articles)**: 管理最新消息、優惠活動等文章內容。
-- **資料庫同步與初始化**: 支援 Sequelize 模型自動同步，並提供強大的資料填充 (Seeding) 功能。
+## 專案定位
 
-## 🛠️ 技術棧
+此 API 以作品集展示與面試說明為目標，重點在於：
 
-- **核心**: Node.js, Express (v5.2.1)
-- **資料庫 ORM**: [Sequelize](https://sequelize.org/)
-- **資料庫**: MySQL (mysql2 驅動)
-- **認證管理**: [jsonwebtoken (JWT)](https://jwt.io/), [bcryptjs](https://github.com/dcodeIO/bcrypt.js)
-- **郵件服務**: [Nodemailer](https://nodemailer.com/) (用於密碼重置)
-- **跨域處理**: [CORS](https://github.com/expressjs/cors)
+- 以 RESTful API 支援前端頁面資料需求
+- 以 JWT 保護需要登入權限的操作
+- 以 Sequelize 管理資料庫存取
+- 可部署於 Google Cloud Run
 
-## 📦 安裝與設定
+## 技術棧（依目前程式碼與 `package.json`）
 
-### 1. 安裝套件
-而在專案根目錄執行：
+- Node.js
+- Express
+- Sequelize
+- PostgreSQL（`pg` / `pg-hstore`）
+- JWT（`jsonwebtoken`）
+- bcryptjs
+- CORS
+- Helmet
+- express-rate-limit
+- Jest / Supertest（測試）
+
+## 部署說明
+
+本專案的部署目標平台為 **Google Cloud Run**。
+
+## 主要 API 範圍
+
+目前路由主要包含：
+
+- `/api/auth`：註冊、登入、忘記密碼、重設密碼、個人資料
+- `/api/models`：車型資料 CRUD
+- `/api/trims`：車款等級資料 CRUD
+- `/api/slides`：首頁輪播資料查詢與新增
+- `/api/articles`：文章資料查詢與新增
+
+> 以上內容對應 `routes/` 目前檔案：`auth.js`、`models.js`、`trims.js`、`slides.js`、`articles.js`。
+
+## 本機開發
+
+1. 安裝依賴
+
 ```bash
 npm install
 ```
 
-### 2. 環境變數設定 (.env)
-請建立 `.env` 檔案並設定以下變數：
-```env
-PORT=3000
-DB_HOST=127.0.0.1
-DB_USER=root
-DB_PASS=你的密碼
-DB_NAME=my_api_db
-JWT_SECRET=你的私鑰
-EMAIL_USER=你的信箱
-EMAIL_PASS=你的應用程式碼
+2. 建立環境變數檔
+
+請複製 `.env.example` 為 `.env`，再填入本機實際值。
+
+```bash
+# Linux / macOS
+cp .env.example .env
+
+# Windows PowerShell
+Copy-Item .env.example .env
 ```
 
-### 3. 資料庫初始化與填充
-如果你是第一次啟動專案，或需要恢復預設資料：
+3. 啟動服務
 
-- **法一：使用 npm 指令** (推薦)
-  ```bash
-  # 建立資料庫
-  npm run db:setup
-  # 填充初始資料
-  npm run db:seed
-  ```
-- **法二：使用 API 端點**
-  存取 `GET http://localhost:3000/api/seed` 即可自動填充預設資料。
+```bash
+npm start
+```
 
-## 📖 完整 API 端點列表
+## 環境變數
 
-### 使用者認證 (`/api/auth`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| POST | `/register` | 註冊新帳號 |
-| POST | `/login` | 登入並取得 Token |
-| POST | `/forgot-password` | 發送密碼重置信件 |
-| POST | `/reset-password/:token`| 執行密碼重置 |
-| GET | `/profile` | 取得個人資料 (需 Token) |
+請使用 `.env.example` 作為欄位基準，常用欄位包含：
 
-### 車系管理 (`/api/models`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| GET | `/` | 取得所有車系 |
-| GET | `/:id` | 取得特定車系 |
-| POST | `/` | 新增車系 |
-| PUT | `/:id` | 更新車系內容 |
-| DELETE | `/:id` | 刪除車系 |
+- `PORT`
+- `NODE_ENV`
+- `FRONTEND_URL`
+- `DB_HOST`
+- `DB_PORT`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASSWORD`（程式同時相容 `DB_PASS`）
+- `JWT_SECRET`
+- `EMAIL_SERVICE`
+- `EMAIL_USER`
+- `EMAIL_PASS`
 
-### 車型管理 (`/api/trims`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| GET | `/` | 取得所有車型 (支援 `?model_slug=hs` 過濾) |
-| GET | `/:id` | 取得特定車型詳細規格 |
-| POST | `/` | 新增車型 |
-| PUT | `/:id` | 更新車型內容 |
-| DELETE | `/:id` | 刪除車型 |
+## 可用 npm scripts
 
-### 首頁輪播圖 (`/api/slides`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| GET | `/` | 依排序取得所有輪播圖 |
-| POST | `/` | 新增輪播圖 (管理介面用) |
+- `npm start`：啟動 API 服務（`node index.js`）
+- `npm run db:setup`：初始化資料庫
+- `npm run db:seed`：載入種子資料
+- `npm test`：執行 Jest 測試
 
-### 最新消息文章 (`/api/articles`)
-| 方法 | 路徑 | 說明 |
-| :--- | :--- | :--- |
-| GET | `/` | 取得文章清單 (可依 `?category=最新活動` 過濾) |
-| GET | `/:id` | 取得文章完整內容 (包含 JSON 格式) |
-| POST | `/` | 發佈新文章 |
+## 測試
 
-## 📂 專案結構
-- `controllers/`: 各功能模組的業務邏輯處理中心。
-- `models/`: 資料表結構 (Schema) 的定義與關聯設定。
-- `routes/`: 定義 API 端點路徑。
-- `middleware/`: 中介軟體 (如 JWT 身份驗證、CORS 設定)。
-- `config/`: 資料庫連線與全局設定。
-- `tests/`: 存放所有測試用的腳本、`.http` 檔案與 Postman 集合。
-- `seedAllData.js`: 用於將前端 JS 資料遷移/同步至 MySQL 的核心指令碼。
+```bash
+npm test
+```
 
-## 🧪 測試工具
-- **Postman**: 匯入 `tests/postman_collection.json`。
-- **REST Client**: 可使用 `tests/` 資料夾中的 `.http` 檔案進行測試 (如 `tests/api-tests.http`)。
+## 作品集實作重點（面試可說明）
+
+- 如何將前端資料需求拆成可維護的 API 路由與控制器
+- 如何使用 JWT middleware 控制受保護端點
+- 如何使用 Sequelize 封裝資料操作、降低 SQL 耦合
+- 如何在 API 層加入安全中介層（Helmet、Rate Limit、CORS）
+- 如何讓前後端分離架構可部署到雲端（Cloud Run）
+
+## 目前狀態與限制
+
+- 此專案以作品集用途為主，定位為支援前端展示的後端 API。
+- 功能聚焦在核心資料與驗證流程，未涵蓋大型商業系統的完整營運需求（例如多租戶、複雜權限治理、完整稽核流程等）。
